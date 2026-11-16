@@ -1,0 +1,48 @@
+{
+  "_note": "Remote control for every HypeCut copy. Edit this file on GitHub; apps pick it up within an hour. Keep enforce_limits false until launch.",
+  "version": 1,
+  "enforce_limits": false,
+  "require_signup": false,
+  "trial_days": 14,
+  "trial_line": "Trial version · {days} days left",
+  "show_trial_from": "2026-11-23",
+  "show_credits": false,
+  "show_credits_from": "2026-11-23",
+  "credits": {
+    "per_clip": 5,
+    "_note": "credits charged per finished clip (same for every clip)"
+  },
+  "plans": {
+    "trial": {
+      "label": "Pro trial",
+      "daily_credits": 250,
+      "runs_per_day": null
+    },
+    "free": {
+      "label": "Free",
+      "daily_credits": 75,
+      "runs_per_day": 5
+    },
+    "pro": {
+      "label": "Pro",
+      "daily_credits": 250,
+      "runs_per_day": null
+    }
+  },
+  "banner": {
+    "show": false,
+    "text": "Free Pro trial for 7 days",
+    "button": "Start free trial",
+    "url": ""
+  },
+  "signup": {
+    "form_url": "",
+    "fields": {
+      "name": "",
+      "email": "",
+      "instagram": ""
+    }
+  },
+  "buy_url": "",
+  "limit_message": "You've used today's credits. They refill tomorrow, or go Pro for 50 clips a day."
+}

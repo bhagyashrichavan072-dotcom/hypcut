@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HypeCut</title>
+<link rel="icon" href="/static/icon.png">
+<style>
+:root{
+  --bg1:#0b0b0d; --bg2:#1d1d21; --glow:#3a3a40;
+  --glass:rgba(255,255,255,.08); --glass2:rgba(255,255,255,.13); --line:rgba(255,255,255,.14);
+  --text:#fff; --muted:rgba(255,255,255,.62); --dim:rgba(255,255,255,.42);
+  --orange:#ff7a1a; --orange2:#ff5a00; --violet:#9a9aa2; --pink:#c8c8cc; --cyan:#ffb27a;
+  --ok:#3ddc97; --bad:#ff5a6a; --r:22px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;color:var(--text);
+  background:
+    radial-gradient(900px 600px at 70% 15%, rgba(255,255,255,.07), transparent 60%),
+    radial-gradient(700px 500px at 10% 90%, rgba(255,122,26,.06), transparent 60%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  background-attachment:fixed; padding:0;
+}
+.shell{width:100%;margin:0;background:rgba(255,255,255,.035);border:0;
+  border-radius:0;padding:18px 28px 26px;min-height:100vh}
+/* top bar */
+.top{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.3px}
+.brand img{width:42px;height:42px;border-radius:11px;object-fit:cover;display:block}
+.brand small{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.2px}
+.nav{margin:0 auto;display:flex;gap:6px;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:5px}
+.nav button{border:0;background:transparent;color:var(--muted);font:600 13px inherit;font-family:inherit;padding:9px 16px;border-radius:999px;cursor:pointer;display:flex;gap:7px;align-items:center}
+.nav button.on{background:#fff;color:#111114}
+.nav button:hover:not(.on){color:#fff;background:var(--glass2)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:600;background:var(--glass);border:1px solid var(--line);color:var(--muted)}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.pill.ok .dot{background:var(--ok)} .pill.ok{color:#fff}
+/* layout */
+.grid{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card h2{margin:0 0 4px;font-size:18px} .card .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+h3.sec{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:0 0 10px}
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{border-radius:18px;padding:14px 16px;background:var(--glass2);border:1px solid var(--line)}
+.tile .k{font-size:12px;color:var(--muted);font-weight:600}
+.tile .v{font-size:28px;font-weight:800;margin-top:6px}
+.tile.orange{background:linear-gradient(160deg,var(--orange),var(--orange2));border:0}
+.tile.orange .k{color:rgba(255,255,255,.85)}
+.tile.white{background:#fff;color:#111114;border:0}.tile.white .k{color:#6b6b72}
+/* segmented tabs */
+.seg{display:flex;gap:6px;background:rgba(0,0,0,.18);border-radius:16px;padding:5px;margin-bottom:16px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:600 13px inherit;font-family:inherit;padding:10px 8px;border-radius:12px;cursor:pointer}
+.seg button.on{background:var(--glass2);color:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+label.f{display:block;font-size:12px;color:var(--muted);font-weight:600;margin:12px 0 6px}
+input[type=text],input[type=password],input[type=number],select{
+  width:100%;background:rgba(0,0,0,.22);border:1px solid var(--line);color:#fff;border-radius:14px;
+  padding:12px 14px;font:14px inherit;font-family:inherit;outline:none}
+input:focus,select:focus{border-color:rgba(255,255,255,.45)}
+select option{color:#000}
+.row{display:flex;gap:10px;align-items:center}
+.row > *{flex:1}
+.hint{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.5}
+.btn{border:0;border-radius:14px;padding:12px 18px;font:700 14px inherit;font-family:inherit;cursor:pointer;color:#fff;background:var(--glass2);border:1px solid var(--line)}
+.btn:hover{background:rgba(255,255,255,.2)}
+.btn.primary{background:linear-gradient(135deg,var(--orange),var(--orange2));border:0;box-shadow:0 8px 24px rgba(255,106,0,.35)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.white{background:#fff;color:#111114;border:0}
+.btn.sm{padding:8px 12px;font-size:12px;border-radius:11px}
+.btn.danger{background:rgba(255,90,106,.18);border-color:rgba(255,90,106,.5)}
+.btn.block{width:100%;margin-top:18px;padding:15px}
+details.adv{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.adv summary{cursor:pointer;font-size:13px;color:var(--muted);font-weight:600}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;margin-top:14px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--orange)}
+/* jobs */
+.jobs{display:flex;flex-direction:column;gap:12px;max-height:620px;overflow:auto}
+.job{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:18px;padding:14px}
+.job .h{display:flex;align-items:center;gap:10px}
+.job .t{font-weight:700;font-size:14px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip{font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px}
+.chip.running{background:var(--orange);color:#fff}
+.chip.done{background:#fff;color:#111114}
+.chip.error{background:var(--bad);color:#fff}
+.chip.stopped,.chip.stopping{background:var(--glass2);color:#fff}
+.pbar{height:10px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:12px}
+.pbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--orange),#ffb27a);transition:width .6s}
+.job.error .pbar i{background:var(--bad)} .job.done .pbar i{background:#fff}
+.stage{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:8px}
+.job details{margin-top:8px} .job summary{font-size:11px;color:var(--dim);cursor:pointer}
+.log{margin-top:10px;background:rgba(0,0,0,.3);border-radius:12px;padding:10px;font:12px/1.5 Consolas,ui-monospace,monospace;color:#d4d4d8;max-height:150px;overflow:auto;white-space:pre-wrap}
+.empty{color:var(--dim);font-size:13px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:16px}
+/* clips */
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.toolbar input{max-width:320px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.clip{background:var(--glass);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.clip video{width:100%;aspect-ratio:9/16;background:#000;display:block;object-fit:cover}
+.clip .b{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.clip .tt{font-weight:800;font-size:14px;line-height:1.3}
+.clip .hk{font-size:12px;color:var(--muted)}
+.score{display:flex;gap:8px;align-items:center}
+.badge{font-weight:800;font-size:12px;padding:4px 9px;border-radius:10px;background:#fff;color:#111114}
+.badge.hot{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff}
+.meta{font-size:11px;color:var(--dim)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.cap{font-size:12px;line-height:1.45;color:#e4e4e7;background:rgba(0,0,0,.2);border-radius:10px;padding:8px 10px;white-space:pre-wrap;max-height:120px;overflow:auto}
+.tags{font-size:12px;color:var(--cyan);font-weight:600}
+.runhead{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin-top:8px;padding:10px 14px;border-radius:14px;background:var(--glass2);border:1px solid var(--line)}
+.runhead span{color:var(--muted);font-size:12px;flex:1}
+/* table */
+table{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13px}
+th{text-align:left;color:var(--dim);font-weight:600;font-size:12px;padding:0 12px}
+td{background:rgba(255,255,255,.06);padding:11px 12px}
+tr td:first-child{border-radius:12px 0 0 12px} tr td:last-child{border-radius:0 12px 12px 0}
+tr.sel td{background:rgba(255,255,255,.16)}
+.view{display:none}.view.on{display:block}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#fff;color:#111114;font-weight:700;padding:11px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;transition:.25s;pointer-events:none;font-size:13px}
+.toast.on{opacity:1}
+a{color:var(--cyan)}
+.bar{height:5px;border-radius:9px;background:rgba(255,255,255,.12);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--orange),#ffb27a);border-radius:9px;transition:width .4s}
+.ldot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b3b;margin-left:4px;box-shadow:0 0 0 3px rgba(255,59,59,.25)}
+.alertbar{display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,rgba(255,59,59,.22),rgba(255,122,26,.12));border:1px solid rgba(255,59,59,.45);border-radius:16px;padding:10px 14px;margin:-6px 0 16px}
+.alertbar b{color:#fff} .alertbar span{flex:1;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chan{display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:10px}
+.chan .nm{font-weight:700;font-size:14px} .chan .sub2{font-size:12px;color:var(--dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:520px}
+.chip.live{background:#ff3b3b;color:#fff} .chip.off{background:var(--glass2);color:var(--muted)}
+.trialline{font-size:11.5px;color:var(--dim);text-align:center;margin:-10px 0 14px;letter-spacing:.2px}
+.trialline .d{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange);margin-right:6px;vertical-align:1px}
+.foot{margin-top:26px;text-align:center;font-size:11px;color:var(--dim)}
+.founder{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.avatar{width:110px;height:110px;border-radius:28px;background:linear-gradient(145deg,var(--orange),var(--orange2));display:grid;place-items:center;font-size:46px;font-weight:800}
+.founder h2{font-size:26px;margin:0}
+.founder .role{color:var(--muted);margin:4px 0 12px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+@media (max-width:760px){.facts{grid-template-columns:1fr}.founder{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;place-items:center;z-index:50;backdrop-filter:blur(6px)}
+.modal.on{display:grid}
+.modal .card{width:min(420px,92vw);background:#18181b}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:8px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <div class="brand"><img src="/static/icon.png" alt=""><div>HypeCut<small>AI viral clips auto-editor</small></div></div>
+    <div class="nav">
+      <button data-v="clip" class="on">⚡ Clip</button>
+      <button data-v="clips">🎬 My clips</button>
+      <button data-v="live">📡 Live alerts <span id="liveDot" class="ldot" hidden></span></button>
+      <button data-v="settings">⚙ Settings</button>
+      <button data-v="founder">★ Founder</button>
+      <button data-v="dev" id="devBtn" hidden>🛠 Developer</button>
+    </div>
+    <span id="gemPill" class="pill"><span class="dot"></span><span>Gemini off</span></span>
+  </div>
+
+  <div class="alertbar" id="alertBar" hidden><span id="alertTxt"></span>
+    <button class="btn sm primary" id="alertClip">Clip it now</button><button class="btn sm" onclick="seenAlerts()">Dismiss</button></div>
+  <div class="trialline" id="trialLine" hidden><span class="d"></span><span></span></div>
+
+  <!-- CLIP -->
+  <section id="v-clip" class="view on">
+    <div class="tiles">
+      <div class="tile orange"><div class="k">Clips made</div><div class="v" id="tClips">0</div></div>
+      <div class="tile white"><div class="k">Best viral score</div><div class="v" id="tBest">–</div></div>
+      <div class="tile" id="tileRuns"><div class="k">Runs in progress</div><div class="v" id="tRun">0</div></div>
+      <div class="tile" id="tileCred" hidden><div class="k">Credits today <span id="tPlan" style="float:right;color:var(--orange)"></span></div><div class="v" id="tCred">–</div><div class="bar"><i id="tBar"></i></div><div class="k" id="tCredSub" style="margin-top:6px;font-weight:500"></div></div>
+      <div class="tile"><div class="k">Hooks + captions by</div><div class="v" id="tAi" style="font-size:20px;margin-top:12px">Built-in</div></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h2>Start clipping</h2>
+        <div class="sub">Paste a link. HypeCut finds the <b>6 best moments</b> (from the chat, or from the video itself when there's no chat) and makes <b>6 separate clips</b>. Each run gives new moments, never the same clip twice.</div>
+        <div class="seg" id="kindSeg">
+          <button data-k="video" class="on">Video link</button>
+          <button data-k="channel">Channel (live)</button>
+          <button data-k="file">My files</button>
+          <button data-k="demo">Demo</button>
+        </div>
+
+        <div data-for="video">
+          <label class="f">Finished stream / VOD link</label>
+          <div class="row"><input id="urlVideo" type="text" placeholder="https://www.twitch.tv/videos/123456789  or  https://www.youtube.com/watch?v=…"><button class="btn sm" style="flex:0 0 auto" onclick="pasteInto('urlVideo')">📋 Paste</button></div>
+          <div class="hint">Twitch VODs, YouTube streams and normal YouTube videos. With chat replay HypeCut uses the chat; without chat it finds the hype in the video itself.</div>
+        </div>
+        <div data-for="channel" hidden>
+          <label class="f">Live channel link</label>
+          <div class="row"><input id="urlChannel" type="text" placeholder="https://www.twitch.tv/channelname  or  https://www.youtube.com/@channel/live"><button class="btn sm" style="flex:0 0 auto" onclick="pasteInto('urlChannel')">📋 Paste</button></div>
+          <div class="hint">HypeCut watches the live chat and makes a clip every time it explodes, until you press Stop.</div>
+        </div>
+        <div data-for="file" hidden>
+          <label class="f">Video file</label>
+          <div class="row"><input id="fVideo" type="text" placeholder="C:\…\stream.mp4"><button class="btn sm" style="flex:0" onclick="pick('video','fVideo')">Browse</button></div>
+          <label class="f">Chat log (optional: .jsonl / .csv / .txt / live_chat.json)</label>
+          <div class="row"><input id="fChat" type="text" placeholder="C:\…\chat.jsonl"><button class="btn sm" style="flex:0" onclick="pick('chat','fChat')">Browse</button></div>
+        </div>
+        <div data-for="demo" hidden>
+          <div class="hint" style="font-size:13px">Builds a 3-minute practice stream with chat on your computer and clips it. Takes about 2 minutes. Good for checking everything works.</div>
+        </div>
+
+        <details class="adv">
+          <summary>Clip options</summary>
+          <div class="opts">
+            <div><label class="f">Clips per run</label><input id="oMax" type="number" min="1" max="30" value="6"></div>
+            <div><label class="f">Longest clip (seconds)</label><input id="oLen" type="number" min="10" max="90" value="30"></div>
+            <div><label class="f">Spike sensitivity <span id="zLbl">3.0</span></label><input id="oZ" type="range" min="1.5" max="6" step="0.5" value="3"><div class="hint">Lower = more clips</div></div>
+            <div><label class="f">Language</label><select id="oLang"><option value="">Auto</option><option value="en">English</option><option value="hi">Hindi</option></select></div>
+            <div><label class="f">Caption style</label><select id="oCap"><option value="bold">Bold (yellow word)</option><option value="clean">Clean</option><option value="box">Box</option></select></div>
+            <div><label class="f">Layout</label><select id="oLay"><option value="auto">Auto (face tracking)</option><option value="blur">Blurred background</option><option value="crop">Full-screen crop</option></select></div>
+          </div>
+          <label class="check"><input id="oHing" type="checkbox"> Hinglish captions (needs Gemini)</label>
+          <label class="check"><input id="oFx" type="checkbox" checked> Zoom + chat pop-up effects</label>
+          <label class="check"><input id="oRep" type="checkbox"> Allow moments already clipped in earlier runs</label>
+        </details>
+        <button class="btn primary block" id="startBtn">⚡ Start clipping</button>
+      </div>
+
+      <div class="card">
+        <h2>Progress</h2>
+        <div class="sub">Your clips appear in <b>My clips</b> when they're ready.</div>
+        <div class="jobs" id="jobs"><div class="empty">Nothing running. Paste a link and press Start.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE ALERTS -->
+  <section id="v-live" class="view">
+    <div class="grid">
+      <div class="card">
+        <h2>Live alerts</h2>
+        <div class="sub">Add a YouTuber or streamer once. HypeCut checks every few minutes and alerts you the moment they go live. Keep HypeCut open (minimized is fine).</div>
+        <label class="f">YouTube channel or Twitch link</label>
+        <div class="row"><input id="watchUrl" type="text" placeholder="https://www.youtube.com/@channel   or   @channel   or   https://www.twitch.tv/name"><button class="btn sm" style="flex:0 0 auto" onclick="pasteInto('watchUrl')">📋 Paste</button></div>
+        <label class="check"><input id="watchAuto" type="checkbox"> Start clipping automatically when they go live</label>
+        <button class="btn primary block" onclick="watchAdd()">📡 Watch this channel</button>
+      </div>
+      <div class="card">
+        <div class="row"><div><h2>Watching</h2><div class="sub" id="watchSub">No channels yet.</div></div>
+          <button class="btn sm" style="flex:0 0 auto" onclick="watchCall('check',{}).then(()=>toast('Checking now…'))">Check now</button></div>
+        <div id="watchList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIPS -->
+  <section id="v-clips" class="view">
+    <div class="toolbar">
+      <input id="search" type="text" placeholder="Search titles, hooks, transcripts…">
+      <select id="sort" style="max-width:190px"><option value="new">Newest first</option><option value="viral">Highest viral score</option></select>
+      <span style="flex:1"></span>
+      <button class="btn sm" onclick="openFolder()">Open clips folder</button>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="v-settings" class="view">
+    <div class="grid">
+      <div class="card">
+        <h2>Gemini (optional)</h2>
+        <div class="sub">Gemini writes better hooks, titles and Instagram captions, ranks the clips and does Hinglish. Free key: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></div>
+        <label class="f">API key</label>
+        <input id="sKey" type="password" placeholder="Paste your Gemini API key">
+        <div class="hint" id="keyHint">Saved only on this computer.</div>
+        <div class="row" style="margin-top:14px"><button class="btn white" onclick="saveKey()">Save key</button><button class="btn danger" onclick="removeKey()">Remove key</button></div>
+      </div>
+      <div class="card">
+        <h2>App settings</h2>
+        <div class="sub">Where clips go and which speech model to use.</div>
+        <label class="f">Clips folder</label>
+        <input id="sOut" type="text">
+        <label class="f">Whisper model (speech to text)</label>
+        <select id="sModel"><option value="tiny">Tiny (fastest)</option><option value="base">Base (recommended)</option><option value="small">Small (better)</option><option value="medium">Medium (best, slow)</option></select>
+        <details class="adv"><summary>Use whisper.cpp instead (advanced)</summary>
+          <label class="f">whisper-cli path</label><input id="sCpp" type="text" placeholder="C:\…\whisper-cli.exe">
+          <label class="f">ggml model (.bin)</label><input id="sCppM" type="text" placeholder="C:\…\ggml-base.bin">
+          <div class="hint">Leave empty to use the built-in Whisper.</div>
+        </details>
+        <button class="btn primary block" onclick="saveSettings()">Save settings</button>
+      </div>
+    </div>
+  </section>
+  <!-- DEVELOPER (owner's laptop only) -->
+  <section id="v-dev" class="view">
+    <div class="card" style="margin-bottom:18px">
+      <div class="row" style="align-items:flex-start">
+        <div><h2>Developer mode</h2>
+          <div class="sub">Only on your laptop. These settings control every HypeCut copy people downloaded from GitHub.
+          <b>Save</b> keeps them on this laptop; <b>Publish</b> pushes them to GitHub so every user's app updates within an hour.</div>
+          <div class="hint" id="devGit"></div></div>
+        <label class="check" style="flex:0 0 auto;margin:0"><input id="dvPreview" type="checkbox"> See the app like a GitHub user</label>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h2>Plans &amp; limits</h2>
+        <label class="check"><input id="dvEnforce" type="checkbox"> Limits ON (block runs when credits are used up)</label>
+        <label class="check"><input id="dvSignup" type="checkbox"> Ask for sign-up before clipping</label>
+        <div class="opts">
+          <div><label class="f">Trial days</label><input id="dvTrial" type="number" min="0"></div>
+          <div><label class="f">Trial line text</label><input id="dvTrialLine" type="text"></div>
+          <div><label class="f">Show trial line from (date)</label><input id="dvTrialFrom" type="text" placeholder="2026-11-23"></div>
+        </div>
+        <label class="check"><input id="dvShowCred" type="checkbox"> Show credits now</label>
+        <div class="opts">
+          <div><label class="f">…or show credits from (date)</label><input id="dvCredFrom" type="text" placeholder="2026-11-23"></div>
+          <div><label class="f">Credits per clip</label><input id="dvPerClip" type="number" min="0"></div>
+          <div><label class="f">Free: credits / day</label><input id="dvFreeCr" type="number" min="0"></div>
+          <div><label class="f">Free: runs / day</label><input id="dvFreeRuns" type="number" min="0"></div>
+          <div><label class="f">Trial: credits / day</label><input id="dvTrialCr" type="number" min="0"></div>
+          <div><label class="f">Pro: credits / day</label><input id="dvProCr" type="number" min="0"></div>
+        </div>
+        <label class="f">Message when limit is hit</label><input id="dvLimitMsg" type="text">
+      </div>
+      <div class="card">
+        <h2>Banner, buy link &amp; sign-ups</h2>
+        <label class="check"><input id="dvBanner" type="checkbox"> Show banner in users' apps</label>
+        <label class="f">Banner text</label><input id="dvBText" type="text">
+        <div class="opts">
+          <div><label class="f">Banner button</label><input id="dvBBtn" type="text"></div>
+          <div><label class="f">Banner link</label><input id="dvBUrl" type="text"></div>
+        </div>
+        <label class="f">Buy Pro link (store page)</label><input id="dvBuy" type="text">
+        <label class="f">Google Form link (…/formResponse)</label><input id="dvForm" type="text">
+        <div class="opts">
+          <div><label class="f">Name field id</label><input id="dvFName" type="text" placeholder="entry.123"></div>
+          <div><label class="f">Email field id</label><input id="dvFEmail" type="text" placeholder="entry.456"></div>
+          <div><label class="f">Instagram field id</label><input id="dvFIg" type="text" placeholder="entry.789"></div>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <button class="btn white" onclick="devSave(false)">Save</button>
+          <button class="btn primary" onclick="devSave(true)">Save &amp; publish to GitHub</button>
+        </div>
+        <div class="hint" id="devMsg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOUNDER -->
+  <section id="v-founder" class="view">
+    <div class="card">
+      <div class="founder">
+        <div class="avatar">K</div>
+        <div>
+          <h2>Kunal Mhetre</h2>
+          <div class="role">Founder, HypeCut · AI engineer × brand strategist · JR Revenue Systems</div>
+          <div style="color:#e4e4e7;line-height:1.6;max-width:640px">I built HypeCut so streamers and clippers never miss the moment their chat goes crazy. It reads the chat, finds the hype and turns it into ready-to-post vertical clips, right on your own computer.</div>
+          <div class="row" style="margin-top:16px;flex-wrap:wrap;gap:10px">
+            <a class="btn white" href="https://instagram.com/kunalthinks_ai" target="_blank" style="text-decoration:none;flex:0 0 auto">Instagram @kunalthinks_ai</a>
+          </div>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="tile"><div class="k">Product</div><div class="v" style="font-size:20px">HypeCut</div></div>
+        <div class="tile"><div class="k">Made by</div><div class="v" style="font-size:20px">JR Revenue Systems</div></div>
+        <div class="tile"><div class="k">Version</div><div class="v" style="font-size:20px">0.1</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">HypeCut™ is a trademark of JR Revenue Systems · © 2026 Kunal Mhetre · All rights reserved</div>
+</div>
+
+<!-- sign-up (only appears when switched on from GitHub) -->
+<div class="modal" id="signup">
+  <div class="card">
+    <h2>Welcome to HypeCut</h2>
+    <div class="sub">Create your free account to start clipping.</div>
+    <label class="f">Name</label><input id="suName" type="text">
+    <label class="f">Email</label><input id="suEmail" type="text">
+    <label class="f">Instagram (optional)</label><input id="suIg" type="text" placeholder="@yourhandle">
+    <button class="btn primary block" onclick="doSignup()">Continue</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let kind = 'video', clips = [], cfg = {}; const openLogs = new Set();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
+async function api(path, body){
+  const r = await fetch(path, body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const j = await r.json(); if(!r.ok) throw new Error(j.error||'error'); return j;
+}
+// nav
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+function show(v){
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+  if(v==='clips') loadClips();
+  if(v==='dev') devLoad();
+  if(v==='live') watchCall('list', {});
+}
+// kind tabs
+document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>{
+  kind=b.dataset.k;
+  document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('[data-for]').forEach(x=>x.hidden=x.dataset.for!==kind);
+  $('#startBtn').textContent = kind==='channel' ? '🔴 Start watching live' : '⚡ Start clipping';
+});
+$('#oZ').oninput=e=>$('#zLbl').textContent=(+e.target.value).toFixed(1);
+
+async function pasteInto(id){
+  let t = '';
+  try { t = await navigator.clipboard.readText(); } catch(e) {}
+  if(!t){ try { t = (await api('/api/clipboard', {})).text; } catch(e) {} }
+  if(!t) return toast('Clipboard is empty');
+  const el = $('#'+id); el.value = t.trim(); el.focus(); toast('Pasted');
+}
+async function pick(k,id){const r=await api('/api/pick',{kind:k}); if(r.path) $('#'+id).value=r.path;}
+
+$('#startBtn').onclick = async ()=>{
+  const req = {kind, options:{max_clips:+$('#oMax').value, max_clip:+$('#oLen').value, z:+$('#oZ').value,
+    language:$('#oLang').value, caption_style:$('#oCap').value, layout:$('#oLay').value,
+    hinglish:$('#oHing').checked, effects:$('#oFx').checked, allow_repeats:$('#oRep').checked}};
+  if(kind==='video'){req.url=$('#urlVideo').value.trim(); if(!req.url.startsWith('http')) return toast('Paste a video link first');}
+  if(kind==='channel'){req.url=$('#urlChannel').value.trim(); if(!req.url.startsWith('http')) return toast('Paste a channel link first');}
+  if(kind==='file'){req.video=$('#fVideo').value.trim().replace(/^"|"$/g,''); req.chat=$('#fChat').value.trim().replace(/^"|"$/g,''); if(!req.video) return toast('Pick a video file');}
+  if(req.options.hinglish && !cfg.gemini_set) toast('Hinglish needs a Gemini key (Settings)');
+  try{ await api('/api/run', req); toast(kind==='channel'?'Watching live chat…':'Clipping started'); refresh(); }
+  catch(e){ toast(e.message); }
+};
+
+function renderJobs(jobs){
+  $('#tRun').textContent = jobs.filter(j=>j.status==='running').length;
+
+  if(!jobs.length) return;
+  const open = new Set([...document.querySelectorAll('.job .log')].map(l=>l.dataset.id));
+  $('#jobs').innerHTML = jobs.slice(0,4).map(j=>`
+    <div class="job ${j.status}">
+      <div class="h"><span class="chip ${j.status}">${j.kind==='channel'&&j.status==='running'?'live':(j.status==='running'?'working':j.status)}</span>
+        <span class="t" title="${esc(j.label)}">${esc(j.label)}</span>
+        ${j.status==='running'?`<button class="btn sm danger" onclick="stopJob('${j.id}')">Stop</button>`:''}
+        ${j.status==='done'?`<button class="btn sm white" onclick="show('clips')">See ${j.clips} clips</button>`:''}</div>
+      <div class="pbar"><i style="width:${j.pct}%"></i></div>
+      <div class="stage"><span>${esc(j.stage)}</span><span>${j.pct}%</span></div>
+      <details ${openLogs.has(j.id)?'open':''} ontoggle="this.open?openLogs.add('${j.id}'):openLogs.delete('${j.id}')"><summary>Details</summary><div class="log" data-id="${j.id}">${esc(j.log.join(String.fromCharCode(10)))||'Starting…'}</div></details>
+    </div>`).join('');
+  document.querySelectorAll('.job .log').forEach(l=>l.scrollTop=l.scrollHeight);
+}
+async function stopJob(id){await api('/api/stop/'+id,{}); toast('Stopping…'); refresh();}
+async function openFolder(p){await api('/api/open',{path:p||''});}
+
+function renderClips(){
+  const q=$('#search').value.toLowerCase();
+  let list=clips.filter(c=>!q||[c.title,c.hook,c.transcript,c.folder].join(' ').toLowerCase().includes(q));
+  if($('#sort').value==='viral') list=[...list].sort((a,b)=>(b.viral||0)-(a.viral||0));
+  const card = c => `
+    <div class="clip">
+      <video src="/clips/${encodeURI(c.rel)}" controls preload="metadata"></video>
+      <div class="b">
+        <div class="score"><span class="badge ${c.viral>=80?'hot':''}">🔥 Viral ${c.viral??'–'}/100</span><span class="meta">${c.duration?Math.round(c.duration)+'s':''} · chat spike ${c.z??''}</span></div>
+        <div class="tt">${esc(c.title||c.id)}</div>
+        <div class="hk"><b>Hook:</b> ${esc(c.hook||'')}</div>
+        <div class="cap">${esc(c.caption||'')}</div>
+        <div class="tags">${esc(Array.isArray(c.hashtags)?c.hashtags.join(' '):(c.hashtags||''))}</div>
+        <div class="acts">
+          <button class="btn sm white" onclick="copyCap(${clips.indexOf(c)})">Copy caption + hashtags</button>
+          <a class="btn sm" href="/clips/${encodeURI(c.rel)}" download style="text-decoration:none">Download</a>
+          ${c.flow?`<button class="btn sm" onclick="copyFlow(${clips.indexOf(c)})">Flow prompt</button>`:''}
+          <button class="btn sm danger" title="Delete clip" onclick="delClip(${clips.indexOf(c)})">🗑 Delete</button>
+        </div>
+      </div>
+    </div>`;
+  if(!list.length){ $('#gallery').innerHTML='<div class="empty" style="grid-column:1/-1">No clips yet. Start a run on the Clip tab.</div>'; return; }
+  if($('#sort').value==='viral'){ $('#gallery').innerHTML = list.map(card).join(''); return; }
+  const runs = {}; list.forEach(c => (runs[c.folder] = runs[c.folder] || []).push(c));
+  $('#gallery').innerHTML = Object.entries(runs).map(([f, cs]) => `
+    <div class="runhead"><b>${esc(f.replace(/_/g,' '))}</b><span>${cs.length} clip${cs.length>1?'s':''}</span>
+      <button class="btn sm" onclick='openFolder(${JSON.stringify(f)})'>Folder</button></div>
+    ${cs.sort((x,y)=>(y.viral||0)-(x.viral||0)).map(card).join('')}`).join('');
+}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>toast('Copied'),()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied')})}
+function copyCap(i){const c=clips[i];copyText((c.caption||'')+'\n\n'+(Array.isArray(c.hashtags)?c.hashtags.join(' '):(c.hashtags||'')))}
+function copyFlow(i){copyText(clips[i].flow)}
+async function delClip(i){
+  const c=clips[i]; if(!confirm('Delete this clip? ' + (c.title||c.id) + ' (it goes to the Recycle Bin, so you can restore it)')) return;
+  try{ await api('/api/delete',{rel:c.rel}); toast('Clip deleted'); loadClips(); }catch(e){ toast(e.message); }
+}
+$('#search').oninput=renderClips; $('#sort').onchange=renderClips;
+
+async function loadClips(){
+  clips = await api('/api/clips');
+  $('#tClips').textContent = clips.length;
+  $('#tBest').textContent = clips.length ? Math.max(...clips.map(c=>c.viral||0)) : '–';
+  if($('#v-clips').classList.contains('on')) renderClips();
+}
+
+function renderCfg(c){
+  cfg=c;
+  const p=$('#gemPill'); p.classList.toggle('ok',c.gemini_set); p.lastElementChild.textContent=c.gemini_set?'Gemini on':'Gemini off';
+  $('#tAi').textContent = c.gemini_set ? 'Gemini AI' : 'Built-in (free)';
+  $('#keyHint').textContent = c.gemini_set ? `Key saved (${c.gemini_hint}). Saved only on this computer.` : 'No key saved. Clips still work with offline hooks and captions.';
+}
+function renderAccount(a){
+  if(!a) return;
+  const t=$('#trialLine'); t.hidden=!a.trial_line; t.lastElementChild.textContent=a.trial_line||'';
+  $('#signup').classList.toggle('on', !!a.need_signup);
+  $('#devBtn').hidden = !a.developer; $('#dvPreview').checked = !!a.preview_user;
+  $('#tileCred').hidden = !a.show_credits; $('#tileRuns').hidden = !!a.show_credits;
+  $('#tPlan').textContent = a.label || '';
+  if(a.credits_left===null||a.credits_left===undefined){ $('#tCred').textContent='Unlimited'; $('#tBar').style.width='100%'; $('#tCredSub').textContent='Owner version'; }
+  else{ $('#tCred').textContent = a.credits_left + ' / ' + a.daily_credits;
+    $('#tBar').style.width = (a.daily_credits ? Math.round(100*a.credits_left/a.daily_credits) : 0) + '%';
+    $('#tCredSub').textContent = a.cost_per_clip + ' credits per clip · ' + Math.floor(a.credits_left/(a.cost_per_clip||1)) + ' clips left'; }
+}
+async function doSignup(){
+  const name=$('#suName').value.trim(), email=$('#suEmail').value.trim(), instagram=$('#suIg').value.trim();
+  if(!email.includes('@')) return toast('Enter a valid email');
+  try{ renderAccount(await api('/api/signup',{name,email,instagram})); toast('Welcome, '+(name||'creator')+'!'); }catch(e){ toast(e.message); }
+}
+let devCtl = null;
+async function devLoad(){
+  const d = await api('/api/dev/get', {}); devCtl = d.control; const c = devCtl;
+  const pl = c.plans || {}; const b = c.banner || {}; const su = c.signup || {fields:{}};
+  $('#devGit').textContent = d.github ? ('GitHub: ' + d.github) : 'Not on GitHub yet: Publish works after the repo is created.';
+  $('#dvEnforce').checked = !!c.enforce_limits; $('#dvSignup').checked = !!c.require_signup;
+  $('#dvTrial').value = c.trial_days ?? 14; $('#dvTrialLine').value = c.trial_line || ''; $('#dvTrialFrom').value = c.show_trial_from || '';
+  $('#dvShowCred').checked = !!c.show_credits; $('#dvCredFrom').value = c.show_credits_from || '';
+  $('#dvPerClip').value = (c.credits||{}).per_clip ?? 5;
+  $('#dvFreeCr').value = (pl.free||{}).daily_credits ?? 75; $('#dvFreeRuns').value = (pl.free||{}).runs_per_day ?? 5;
+  $('#dvTrialCr').value = (pl.trial||{}).daily_credits ?? 250; $('#dvProCr').value = (pl.pro||{}).daily_credits ?? 250;
+  $('#dvLimitMsg').value = c.limit_message || '';
+  $('#dvBanner').checked = !!b.show; $('#dvBText').value = b.text || ''; $('#dvBBtn').value = b.button || ''; $('#dvBUrl').value = b.url || '';
+  $('#dvBuy').value = c.buy_url || ''; $('#dvForm').value = su.form_url || '';
+  $('#dvFName').value = (su.fields||{}).name || ''; $('#dvFEmail').value = (su.fields||{}).email || ''; $('#dvFIg').value = (su.fields||{}).instagram || '';
+}
+async function devSave(publish){
+  const c = JSON.parse(JSON.stringify(devCtl || {}));
+  c.enforce_limits = $('#dvEnforce').checked; c.require_signup = $('#dvSignup').checked;
+  c.trial_days = +$('#dvTrial').value; c.trial_line = $('#dvTrialLine').value; c.show_trial_from = $('#dvTrialFrom').value.trim();
+  c.show_credits = $('#dvShowCred').checked; c.show_credits_from = $('#dvCredFrom').value.trim();
+  c.credits = {...(c.credits||{}), per_clip: +$('#dvPerClip').value};
+  c.plans = c.plans || {};
+  c.plans.free = {...(c.plans.free||{label:'Free'}), daily_credits: +$('#dvFreeCr').value, runs_per_day: +$('#dvFreeRuns').value};
+  c.plans.trial = {...(c.plans.trial||{label:'Pro trial'}), daily_credits: +$('#dvTrialCr').value};
+  c.plans.pro = {...(c.plans.pro||{label:'Pro'}), daily_credits: +$('#dvProCr').value};
+  c.limit_message = $('#dvLimitMsg').value;
+  c.banner = {show: $('#dvBanner').checked, text: $('#dvBText').value, button: $('#dvBBtn').value, url: $('#dvBUrl').value};
+  c.buy_url = $('#dvBuy').value.trim();
+  c.signup = {form_url: $('#dvForm').value.trim(), fields: {name: $('#dvFName').value.trim(), email: $('#dvFEmail').value.trim(), instagram: $('#dvFIg').value.trim()}};
+  let r = await api('/api/dev/save', {control: c}); devCtl = c;
+  if(publish){ if(!confirm('Publish these settings to GitHub? Every user\'s app will update within an hour.')) { $('#devMsg').textContent = r.message; return; }
+    r = await api('/api/dev/publish', {}); }
+  $('#devMsg').textContent = r.message; toast(r.message);
+}
+$('#dvPreview').onchange = async e => { renderAccount(await api('/api/dev/preview', {on: e.target.checked})); toast(e.target.checked ? 'Showing the GitHub user version' : 'Back to your owner version'); };
+let watchData = {channels:[]};
+async function watchCall(act, body){ watchData = await api('/api/watch/'+act, body||{}); renderWatch(); return watchData; }
+async function watchAdd(){
+  const url = $('#watchUrl').value.trim(); if(!url) return toast('Paste a channel link first');
+  try{ await watchCall('add', {url, auto_clip: $('#watchAuto').checked}); $('#watchUrl').value=''; toast('Watching. First check starts now'); }catch(e){ toast(e.message); }
+}
+function ago(t){ if(!t) return 'not checked yet'; const m=Math.round((Date.now()/1000-t)/60); return m<1?'checked just now':'checked '+m+' min ago'; }
+function renderWatch(){
+  const cs = watchData.channels||[];
+  $('#watchSub').textContent = cs.length ? `${cs.length} channel${cs.length>1?'s':''} · checks every ${watchData.interval_min||3} min` : 'No channels yet.';
+  $('#watchList').innerHTML = cs.map(c=>`
+    <div class="chan">
+      <span class="chip ${c.live?'live':'off'}">${c.live?'● live':'offline'}</span>
+      <div style="flex:1;min-width:0"><div class="nm">${esc(c.name)}</div>
+        <div class="sub2">${c.live?esc(c.title||'Live now'):esc(c.error||ago(c.checked))}</div></div>
+      ${c.live?`<button class="btn sm primary" onclick='clipLive(${JSON.stringify(c.live_url||c.url)})'>Clip live</button>`:''}
+      <label class="check" style="margin:0;font-size:12px"><input type="checkbox" ${c.auto_clip?'checked':''} onchange='watchCall("auto",{url:${JSON.stringify(c.url)},on:this.checked})'> Auto-clip</label>
+      <button class="btn sm danger" onclick='watchCall("remove",{url:${JSON.stringify(c.url)}})'>Remove</button>
+    </div>`).join('');
+}
+async function clipLive(url){
+  try{ await api('/api/run', {kind:'channel', url, options:{}}); toast('Clipping the live stream…'); show('clip'); refresh(); }catch(e){ toast(e.message); }
+}
+async function seenAlerts(){ await watchCall('seen', {}); $('#alertBar').hidden = true; }
+let lastAlertT = 0;
+function renderAlerts(s){
+  $('#liveDot').hidden = !s.live_now;
+  const a = (s.alerts||[])[0];
+  $('#alertBar').hidden = !a;
+  if(!a) return;
+  $('#alertTxt').innerHTML = `<b>🔴 ${esc(a.name)} is LIVE</b> · ${esc(a.title||'')}`;
+  $('#alertClip').onclick = () => { clipLive(a.url); seenAlerts(); };
+  if(a.t > lastAlertT){ lastAlertT = a.t; toast('🔴 ' + a.name + ' just went live'); }
+}
+let lastRunning = 0;
+async function refresh(){
+  try{
+    const s = await api('/api/state');
+    renderCfg(s.config); renderJobs(s.jobs); renderAccount(s.account); renderAlerts(s);
+    if($('#v-live').classList.contains('on')) watchCall('list', {});
+    const running = s.jobs.filter(j=>j.status==='running').length;
+    if(running!==lastRunning || running) loadClips();
+    lastRunning = running;
+  }catch(e){}
+}
+async function init(){
+  const s = await api('/api/state'); const c=s.config; renderCfg(c); renderAccount(s.account);
+  $('#oMax').value=c.max_clips; $('#oLen').value=c.max_clip; $('#oZ').value=c.z; $('#zLbl').textContent=(+c.z).toFixed(1);
+  $('#oLang').value=c.language||''; $('#oCap').value=c.caption_style; $('#oLay').value=c.layout; $('#oHing').checked=!!c.hinglish; $('#oFx').checked=c.effects!==false;
+  $('#sOut').value=c.out_dir; $('#sModel').value=c.whisper_model||'base'; $('#sCpp').value=c.whisper_cpp||''; $('#sCppM').value=c.whisper_cpp_model||'';
+  renderJobs(s.jobs); loadClips();
+  setInterval(refresh, 1500);
+}
+async function saveKey(){const k=$('#sKey').value.trim(); if(!k) return toast('Paste a key first'); renderCfg(await api('/api/config',{gemini_key:k})); $('#sKey').value=''; toast('Gemini key saved');}
+async function removeKey(){renderCfg(await api('/api/config',{gemini_key:''})); toast('Gemini key removed');}
+async function saveSettings(){
+  renderCfg(await api('/api/config',{out_dir:$('#sOut').value.trim(), whisper_model:$('#sModel').value,
+    whisper_cpp:$('#sCpp').value.trim(), whisper_cpp_model:$('#sCppM').value.trim(),
+    max_clips:+$('#oMax').value, max_clip:+$('#oLen').value, z:+$('#oZ').value, language:$('#oLang').value,
+    caption_style:$('#oCap').value, layout:$('#oLay').value, hinglish:$('#oHing').checked, effects:$('#oFx').checked}));
+  toast('Settings saved'); loadClips();
+}
+init();
+</script>
+</body>
+</html>

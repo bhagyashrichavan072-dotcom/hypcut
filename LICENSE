@@ -1,0 +1,38 @@
+HypeCut Source-Available License
+Copyright (c) 2026 Kunal Mhetre / JR Revenue Systems (@kunalthinks_ai). All rights reserved.
+"HypeCut" and the HypeCut logo are trademarks of JR Revenue Systems.
+
+"HypeCut" means the software, source code, documentation, name and logo in this repository.
+
+1. What you MAY do
+   - Read the source code.
+   - Download and run HypeCut on your own computer to make clips for yourself or your
+     own channel, using the official releases from this repository.
+   - Report bugs and suggest changes through this repository's issues and pull requests.
+
+2. What you may NOT do without written permission from the copyright holder
+   - Copy, publish, redistribute, mirror or re-upload HypeCut or any part of its source code.
+   - Modify HypeCut and distribute or share the modified version (forks may exist only on
+     GitHub for the purpose of sending a pull request to this repository).
+   - Sell, rent, sublicense or offer HypeCut, or a service built on it, to others.
+   - Remove or bypass the licensing, plan limits, sign-up or update features.
+   - Rebrand HypeCut, or use the HypeCut name, logo or a confusingly similar name or logo
+     for any product or service.
+
+3. Contributions
+   By sending a contribution you grant the copyright holder a perpetual, worldwide,
+   royalty-free right to use, change and relicense it as part of HypeCut.
+
+4. Third-party software
+   HypeCut uses open-source tools (ffmpeg, Whisper, yt-dlp, streamlink, chat-downloader and
+   others) under their own licenses. This license does not change those licenses.
+
+5. No warranty
+   HypeCut is provided "as is", without warranty of any kind. The copyright holder is not
+   liable for any claim, damage or other liability arising from its use. You are responsible
+   for having the rights to clip any stream you use it on.
+
+6. Termination
+   Any use that breaks these terms ends your permission to use HypeCut.
+
+For permissions or business use, contact @kunalthinks_ai on Instagram.
